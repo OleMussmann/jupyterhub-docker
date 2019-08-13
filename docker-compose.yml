@@ -37,7 +37,8 @@ services:
       - "8080:8080"
     volumes:
       - ./reverse-proxy/traefik.toml:/etc/traefik/traefik.toml
-      - /etc/certs:/etc/certs
+      - /home/ubuntu/letsencrypt-docker/config/etc/letsencrypt/live/statnl.duckdns.org/fullchain.pem:/etc/certs/fullchain.pem
+      - /home/ubuntu/letsencrypt-docker/config/etc/letsencrypt/live/statnl.duckdns.org/privkey.pem:/etc/certs/privkey.pem
       - /var/run/docker.sock:/var/run/docker.sock
     restart: on-failure
 
