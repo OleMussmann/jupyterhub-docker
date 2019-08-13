@@ -1,4 +1,92 @@
 import os
+import shlex
+from dockerspawner import DockerSpawner
+
+class FormSpawner(DockerSpawner):
+    def _options_form_default(self):
+        default_stack = "jupyter/minimal-notebook"
+        default_env = "YOURNAME=%s\n" % self.user.name
+        return """
+	<br>
+        <div class="form-group">
+	    <label for="stack">Select your desired stack</label>
+	    <select name="stack" size="1">
+		<option value="jupyter/r-notebook">R: </option>
+		<option value="jupyter/tensorflow-notebook">Tensorflow: </option>
+		<option value="jupyter/datascience-notebook">Datascience: </option>
+		<option value="jupyter/all-spark-notebook">Spark: </option>
+		<option value="jupyterlab_img">Course: </option>
+	    </select>
+        </div>
+        <div class="form-group">
+            <label for="args">Extra notebook CLI arguments</label>
+            <input name="args" class="form-control"
+                placeholder="e.g. --debug"></input>
+        </div>
+        <div class="form-group">
+            <label for="env">Environment variables (one per line)</label>
+            <textarea class="form-control" name="env">{env}</textarea>
+        </div>
+        """.format(
+            env=default_env,
+	    stack=default_stack
+        )
+
+    def options_from_form(self, formdata):
+        options = {}
+        options['env'] = env = {}
+        options['stack'] = formdata['stack']
+
+        env_lines = formdata.get('env', [''])
+        for line in env_lines[0].splitlines():
+            if line:
+                key, value = line.split('=', 1)
+                env[key.strip()] = value.strip()
+
+        arg_s = formdata.get('args', [''])[0].strip()
+        if arg_s:
+            options['argv'] = shlex.split(arg_s)
+        image = ''.join(formdata['stack'])
+        print("SPAWN: " + image + " IMAGE" )
+        self.image = image
+        return options
+
+    def get_args(self):
+        """Return arguments to pass to the notebook server"""
+        argv = super().get_args()
+        if self.user_options.get('argv'):
+            argv.extend(self.user_options['argv'])
+        return argv
+
+    def get_env(self):
+        env = super().get_env()
+        if self.user_options.get('env'):
+            env.update(self.user_options['env'])
+        return env
+
+
+#class FormSpawner(DockerSpawner):
+#    def _options_form_default(self):
+#        default_stack = "jupyter/minimal-notebook"
+#        return """
+#        <label for="stack">Select your desired stack</label>
+#        <select name="stack" size="1">
+#        <option value="jupyter/r-notebook">R: </option>
+#        <option value="jupyter/tensorflow-notebook">Tensorflow: </option>
+#        <option value="jupyter/datascience-notebook">Datascience: </option>
+#        <option value="jupyter/all-spark-notebook">Spark: </option>
+#        </select>
+#        """.format(stack=default_stack)
+#
+#    def options_from_form(self, formdata):
+#        options = {}
+#        options['stack'] = formdata['stack']
+#        image = ''.join(formdata['stack'])
+#        print("SPAWN: " + image + " IMAGE" )
+#        self.image = image
+#        return options
+#
+c.JupyterHub.spawner_class = FormSpawner
 
 ## Generic
 c.JupyterHub.admin_access = True
@@ -26,8 +114,8 @@ c.PAMAuthenticator.service = 'login'
 c.PAMAuthenticator.open_sessions = False
 
 ## Docker spawner
-c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
-c.DockerSpawner.image = os.environ['DOCKER_JUPYTER_CONTAINER']
+#c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
+#c.DockerSpawner.image = os.environ['DOCKER_JUPYTER_CONTAINER']
 c.DockerSpawner.network_name = os.environ['DOCKER_NETWORK_NAME']
 # See https://github.com/jupyterhub/dockerspawner/blob/master/examples/oauth/jupyterhub_config.py
 c.JupyterHub.hub_ip = os.environ['HUB_IP']
