@@ -30,9 +30,15 @@ c.JupyterHub.hub_ip = os.environ['HUB_IP']
 
 # user data persistence
 # see https://github.com/jupyterhub/dockerspawner#data-persistence-and-dockerspawner
-notebook_dir = os.environ.get('DOCKER_NOTEBOOK_DIR') or '/home/jovyan'
+home_dir = os.environ.get('DOCKER_NOTEBOOK_DIR') or '/home/jovyan'
+notebook_dir = home_dir + '/work'
 c.DockerSpawner.notebook_dir = notebook_dir
-c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
+c.DockerSpawner.volumes = {
+        'jupyterhub-user-{username}': home_dir,
+        '/home/{username}/work': notebook_dir,
+        '/home/ubuntu/data': {"bind": home_dir + '/data', "mode": "ro"},
+        '/home/ubuntu/share': home_dir + '/share'
+        }
 
 # Other stuff
 c.Spawner.cpu_limit = 1
