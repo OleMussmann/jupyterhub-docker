@@ -5,21 +5,25 @@ c.JupyterHub.admin_access = True
 c.Spawner.default_url = '/lab'
 
 ## Authenticator
-from jhub_cas_authenticator.cas_auth import CASAuthenticator
-c.JupyterHub.authenticator_class = CASAuthenticator
+c.JupyterHub.authenticator_class = 'jupyterhub.auth.PAMAuthenticator'
 
-# The CAS URLs to redirect (un)authenticated users to.
-c.CASAuthenticator.cas_login_url = 'https://cas.uvsq.fr/login'
-c.CASLocalAuthenticator.cas_logout_url = 'https://cas.uvsq/logout'
+c.Authenticator.admin_users = {'ole', 'marco', 'martijn'}
+c.Authenticator.whitelist = {'ole', 'user', 'marco', 'martijn'}
+#c.LocalAuthenticator.create_system_users = True
 
-# The CAS endpoint for validating service tickets.
-c.CASAuthenticator.cas_service_validate_url = 'https://cas.uvsq.fr/serviceValidate'
+#------------------------------------------------------------------------------
+# PAMAuthenticator configuration
+#------------------------------------------------------------------------------
 
-# The service URL the CAS server will redirect the browser back to on successful authentication.
-c.CASAuthenticator.cas_service_url = 'https://%s/hub/login' % os.environ['HOST']
+# Authenticate local Linux/UNIX users with PAM
 
-c.Authenticator.admin_users = { 'lucadefe' }
+# The encoding to use for PAM
+c.PAMAuthenticator.encoding = 'utf8'
 
+# The PAM service to use for authentication.
+c.PAMAuthenticator.service = 'login'
+
+c.PAMAuthenticator.open_sessions = False
 
 ## Docker spawner
 c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
@@ -27,6 +31,9 @@ c.DockerSpawner.image = os.environ['DOCKER_JUPYTER_CONTAINER']
 c.DockerSpawner.network_name = os.environ['DOCKER_NETWORK_NAME']
 # See https://github.com/jupyterhub/dockerspawner/blob/master/examples/oauth/jupyterhub_config.py
 c.JupyterHub.hub_ip = os.environ['HUB_IP']
+
+## Remove containers once they are stopped
+c.DockerSpawner.remove_containers = True
 
 # user data persistence
 # see https://github.com/jupyterhub/dockerspawner#data-persistence-and-dockerspawner
