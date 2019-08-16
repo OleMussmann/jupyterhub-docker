@@ -6,33 +6,59 @@ class FormSpawner(DockerSpawner):
     def _options_form_default(self):
         default_stack = "jupyter/minimal-notebook"
         default_env = "YOURNAME=%s\n" % self.user.name
+        default_mem_limit = '2G'
+        default_cpu_limit = 1
         return """
-	<br>
-        <div class="form-group">
-	    <label for="stack">Select your desired stack</label>
-	    <select name="stack" size="1">
-		<option value="jupyter/r-notebook">R: </option>
-		<option value="jupyter/tensorflow-notebook">Tensorflow: </option>
-		<option value="jupyter/datascience-notebook">Datascience: </option>
-		<option value="jupyter/all-spark-notebook">Spark: </option>
-		<option value="jupyterlab_img">Course: </option>
-	    </select>
-        </div>
-        <div class="form-group">
-            <label for="args">Extra notebook CLI arguments</label>
-            <input name="args" class="form-control"
-                placeholder="e.g. --debug"></input>
-        </div>
-        <div class="form-group">
-            <label for="env">Environment variables (one per line)</label>
-            <textarea class="form-control" name="env">{env}</textarea>
-        </div>
+            <div class="form-group" style="width: 100%;">
+              <label for="stack" style="padding-left: .5ex;">Stack</label>
+              <select name="stack" style="width: 100%; max-width: 100%;">
+                <option value="jupyter/r-notebook">R: jupyter/r-notebook</option>
+                <option value="jupyter/tensorflow-notebook">Tensorflow: jupyter/r-notebook</option>
+                <option value="jupyter/datascience-notebook">Datascience: jupyter/datascience-notebook</option>
+                <option value="jupyter/all-spark-notebook">Spark: jupyter/all-spark-notebook</option>
+                <option selected="selected" value="jupyterlab_img">Course: all-in-one</option>
+              </select>
+            </div>
+            <br>
+            <div class="form-group" style="width: 100%;">
+              <label for="mem_limit" style="padding-left: .5ex;">Max RAM</label>
+              <div style="width: 100%-2rem; max-width: 100%-2rem; padding: 0 1rem; display: flex; justify-content: space-between;">
+                <div style="text-align: center; width: 10%; cursor: pointer;" onclick="document.getElementById('mem_limit').value = '0';">500 Mb</div>
+                <div style="text-align: center; width: 10%; cursor: pointer;" onclick="document.getElementById('mem_limit').value = '1';">1 Gb</div>
+                <div style="text-align: center; width: 10%; cursor: pointer;" onclick="document.getElementById('mem_limit').value = '2';">2 Gb</div>
+                <div style="text-align: center; width: 10%; cursor: pointer;" onclick="document.getElementById('mem_limit').value = '3';">4 Gb</div>
+                <div style="text-align: center; width: 10%; cursor: pointer;" onclick="document.getElementById('mem_limit').value = '4';">8 Gb</div>
+              </div>
+              <input type="range" value="1" class="form-range" min="0" max="4" name="mem_limit" id="mem_limit" style="padding: 0 5%;"></input>
+            </div>
+            <div class="form-group" style="width: 100%; max-width: 100%;">
+              <label for="cpu_limit" style="padding-left: .5ex;">Max CPUs</label>
+              <div style="width: 100%-2rem; max-width: 100%-2rem; padding: 0 1rem; display: flex; justify-content: space-between;">
+                <div style="text-align: center; width: 10%; cursor: pointer;" onclick="document.getElementById('cpu_limit').value = '0';">1 core</div>
+                <div style="text-align: center; width: 10%; cursor: pointer;" onclick="document.getElementById('cpu_limit').value = '1';">2 cores</div>
+                <div style="text-align: center; width: 10%; cursor: pointer;" onclick="document.getElementById('cpu_limit').value = '2';">4 cores</div>
+                <div style="text-align: center; width: 10%; cursor: pointer;" onclick="document.getElementById('cpu_limit').value = '3';">8 cores</div>
+              </div>
+              <input type="range" value="0" class="form-range" min="0" max="3" name="cpu_limit" id="cpu_limit" style="padding: 0 5%;">
+            </div>
+            <br>
+            <div class="form-group">
+              <label for="args" style="padding-left: .5ex;">Extra notebook CLI arguments</label>
+              <input name="args" class="form-control"
+                 placeholder="e.g. --debug"></input>
+            </div>
+            <div class="form-group">
+              <label for="env" style="padding-left: .5ex;">Environment variables (one per line)</label>
+              <textarea class="form-control" name="env">YOURNAME=ole</textarea>
+            </div>
         """.format(
             env=default_env,
 	    stack=default_stack
         )
 
     def options_from_form(self, formdata):
+        mem_range = ["500M", "1G", "2G", "4G", "8G"]
+        cpu_range = [1, 2, 4, 8]
         options = {}
         options['env'] = env = {}
         options['stack'] = formdata['stack']
@@ -40,15 +66,22 @@ class FormSpawner(DockerSpawner):
         env_lines = formdata.get('env', [''])
         for line in env_lines[0].splitlines():
             if line:
-                key, value = line.split('=', 1)
-                env[key.strip()] = value.strip()
+                if '=' in line:
+                    key, value = line.split('=', 1)
+                    env[key.strip()] = value.strip()
 
         arg_s = formdata.get('args', [''])[0].strip()
         if arg_s:
             options['argv'] = shlex.split(arg_s)
         image = ''.join(formdata['stack'])
+        mem_limit_index = ''.join(formdata['mem_limit'])
+        mem_limit = mem_range[int(mem_limit_index)]
+        cpu_limit_index = float(''.join(formdata['cpu_limit']))
+        cpu_limit = cpu_range[int(cpu_limit_index)]
         print("SPAWN: " + image + " IMAGE" )
         self.image = image
+        self.mem_limit = mem_limit
+        self.cpu_limit = cpu_limit
         return options
 
     def get_args(self):
@@ -136,8 +169,8 @@ c.DockerSpawner.volumes = {
         }
 
 # Other stuff
-c.Spawner.cpu_limit = 1
-c.Spawner.mem_limit = '10G'
+#c.Spawner.cpu_limit = 1
+#c.Spawner.mem_limit = '10G'
 
 
 ## Services
