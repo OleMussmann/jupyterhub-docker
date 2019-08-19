@@ -9,18 +9,23 @@ class FormSpawner(DockerSpawner):
         default_mem_limit = '2G'
         default_cpu_limit = 1
         return """
-            <div class="form-group" style="width: 100%;">
+            <div class="form-group" style="width: 100%; padding-bottom: 1em;">
               <label for="stack" style="padding-left: .5ex;">Stack</label>
-              <select name="stack" style="width: 100%; max-width: 100%;">
+              <select name="stack" style="width: 100%; max-width: 100%;" onChange="document.getElementById('stack_name').style.display = (this.value == 'other') ? 'block' : 'none';">
                 <option value="jupyter/r-notebook">R: jupyter/r-notebook</option>
                 <option value="jupyter/tensorflow-notebook">Tensorflow: jupyter/r-notebook</option>
                 <option value="jupyter/datascience-notebook">Datascience: jupyter/datascience-notebook</option>
                 <option value="jupyter/all-spark-notebook">Spark: jupyter/all-spark-notebook</option>
                 <option selected="selected" value="jupyterlab_img">Course: all-in-one</option>
+                <option value="other">Other...</option>
               </select>
             </div>
-            <br>
-            <div class="form-group" style="width: 100%;">
+            <div class="form-group" id="stack_name" style="width: 100%; padding-bottom: 1em; display: none;">
+              <label for="stack_name" style="padding-left: .5ex;">Stack name</label>
+              <input name="stack_name" class="form-control"
+                 placeholder="e.g. jupyter/tensorflow-notebook"></input>
+            </div>
+            <div class="form-group" style="width: 100%; padding-bottom: 1em;">
               <label for="mem_limit" style="padding-left: .5ex;">Max RAM</label>
               <div style="width: 100%-2rem; max-width: 100%-2rem; padding: 0 1rem; display: flex; justify-content: space-between;">
                 <div style="text-align: center; width: 10%; cursor: pointer;" onclick="document.getElementById('mem_limit').value = '0';">500 Mb</div>
@@ -31,7 +36,7 @@ class FormSpawner(DockerSpawner):
               </div>
               <input type="range" value="1" class="form-range" min="0" max="4" name="mem_limit" id="mem_limit" style="padding: 0 5%;"></input>
             </div>
-            <div class="form-group" style="width: 100%; max-width: 100%;">
+            <div class="form-group" style="width: 100%; max-width: 100%; padding-bottom: 1em;">
               <label for="cpu_limit" style="padding-left: .5ex;">Max CPUs</label>
               <div style="width: 100%-2rem; max-width: 100%-2rem; padding: 0 1rem; display: flex; justify-content: space-between;">
                 <div style="text-align: center; width: 10%; cursor: pointer;" onclick="document.getElementById('cpu_limit').value = '0';">1 core</div>
@@ -41,7 +46,6 @@ class FormSpawner(DockerSpawner):
               </div>
               <input type="range" value="0" class="form-range" min="0" max="3" name="cpu_limit" id="cpu_limit" style="padding: 0 5%;">
             </div>
-            <br>
             <div class="form-group">
               <label for="args" style="padding-left: .5ex;">Extra notebook CLI arguments</label>
               <input name="args" class="form-control"
@@ -74,12 +78,13 @@ class FormSpawner(DockerSpawner):
         if arg_s:
             options['argv'] = shlex.split(arg_s)
         image = ''.join(formdata['stack'])
+        manual_image = ''.join(formdata['stack_name'])
         mem_limit_index = ''.join(formdata['mem_limit'])
         mem_limit = mem_range[int(mem_limit_index)]
         cpu_limit_index = float(''.join(formdata['cpu_limit']))
         cpu_limit = cpu_range[int(cpu_limit_index)]
         print("SPAWN: " + image + " IMAGE" )
-        self.image = image
+        self.image = image if (image != 'other') else manual_image
         self.mem_limit = mem_limit
         self.cpu_limit = cpu_limit
         return options
