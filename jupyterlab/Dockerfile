@@ -124,7 +124,7 @@ RUN conda install --quiet --yes \
     'r-htmlwidgets~=1.3' \
     'r-hexbin~=1.27.3' \
 #    'julia~=1.0.3' && \
-    conda clean -tipsy && \
+    conda clean --all -y && \
     fix-permissions $CONDA_DIR
 
 ENV CPATH=$CONDA_DIR/include
