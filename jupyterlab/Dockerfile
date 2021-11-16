@@ -123,7 +123,7 @@ RUN conda install --quiet --yes \
     'r-tmap~=2.2' \
     'r-htmlwidgets~=1.3' \
     'r-hexbin~=1.27.3' \
-    'julia~=1.0.3' && \
+#    'julia~=1.0.3' && \
     conda clean -tipsy && \
     fix-permissions $CONDA_DIR
 
