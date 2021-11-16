@@ -8,19 +8,19 @@ LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
 USER root
 
 # Spark dependencies
-ENV APACHE_SPARK_VERSION 2.4.8
-ENV HADOOP_VERSION 2.7
+#ENV APACHE_SPARK_VERSION 2.4.8
+#ENV HADOOP_VERSION 2.7
 
 RUN apt-get -y update && \
     apt-get install --no-install-recommends -y openjdk-8-jre-headless ca-certificates-java && \
     rm -rf /var/lib/apt/lists/*
 
-RUN cd /tmp && \
-    wget -q http://mirrors.ukfast.co.uk/sites/ftp.apache.org/spark/spark-${APACHE_SPARK_VERSION}/spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz && \
+#RUN cd /tmp && \
+#    wget -q http://mirrors.ukfast.co.uk/sites/ftp.apache.org/spark/spark-${APACHE_SPARK_VERSION}/spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz && \
 #    echo "E8B7F9E1DEC868282CADCAD81599038A22F48FB597D44AF1B13FCC76B7DACD2A1CAF431F95E394E1227066087E3CE6C2137C4ABAF60C60076B78F959074FF2AD *spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" | sha512sum -c - && \
-    tar xzf spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz -C /usr/local --owner root --group root --no-same-owner && \
-    rm spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
-RUN cd /usr/local && ln -s spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION} spark
+#    tar xzf spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz -C /usr/local --owner root --group root --no-same-owner && \
+#    rm spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
+#RUN cd /usr/local && ln -s spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION} spark
 
 # Mesos dependencies
 # Install from the Xenial Mesosphere repository since there does not (yet)
@@ -36,23 +36,23 @@ RUN apt-get -y update && \
     rm -rf /var/lib/apt/lists/*
 
 # Spark and Mesos config
-ENV SPARK_HOME /usr/local/spark
-ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.7-src.zip
-ENV MESOS_NATIVE_LIBRARY /usr/local/lib/libmesos.so
-ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
+#ENV SPARK_HOME /usr/local/spark
+#ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.7-src.zip
+#ENV MESOS_NATIVE_LIBRARY /usr/local/lib/libmesos.so
+#ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
 
 USER $NB_UID
 
 # Install pyarrow
-RUN conda install --quiet -y 'pyarrow' && \
-    conda clean --all -f -y && \
-    fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
+#RUN conda install --quiet -y 'pyarrow' && \
+#    conda clean --all -f -y && \
+#    fix-permissions $CONDA_DIR && \
+#    fix-permissions /home/$NB_USER
 
 #####
 
-ENV RSTUDIO_PKG=rstudio-server-1.2.1335-amd64.deb
-ENV SHINY_PKG=shiny-server-1.5.9.923-amd64.deb
+#ENV RSTUDIO_PKG=rstudio-server-1.2.1335-amd64.deb
+#ENV SHINY_PKG=shiny-server-1.5.9.923-amd64.deb
 
 USER root
 
@@ -82,24 +82,24 @@ RUN apt-get update && \
 #    && apt-get clean && \
 #    rm -rf /var/lib/apt/lists/*
 
-RUN wget -q https://download2.rstudio.org/server/bionic/amd64/${RSTUDIO_PKG}
-RUN wget -q https://download3.rstudio.org/ubuntu-14.04/x86_64/${SHINY_PKG}
-RUN dpkg -i ${RSTUDIO_PKG}
-RUN dpkg -i ${SHINY_PKG}
-RUN rm ${RSTUDIO_PKG}
-RUN rm ${SHINY_PKG}
+#RUN wget -q https://download2.rstudio.org/server/bionic/amd64/${RSTUDIO_PKG}
+#RUN wget -q https://download3.rstudio.org/ubuntu-14.04/x86_64/${SHINY_PKG}
+#RUN dpkg -i ${RSTUDIO_PKG}
+#RUN dpkg -i ${SHINY_PKG}
+#RUN rm ${RSTUDIO_PKG}
+#RUN rm ${SHINY_PKG}
 
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Fix SageMath kernel, still as root
-RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/bin:\/usr\/sbin:\/usr\/bin:\/sbin:\/bin", "\/usr\/bin\/sage"/' /usr/share/jupyter/kernels/sagemath/kernel.json
+#RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/bin:\/usr\/sbin:\/usr\/bin:\/sbin:\/bin", "\/usr\/bin\/sage"/' /usr/share/jupyter/kernels/sagemath/kernel.json
 
 USER $NB_UID
 
 # Conda packages
 RUN conda install --quiet --yes \
-    'pyspark~=2.4.3' \
+#    'pyspark~=2.4.3' \
     'r-base~=3.6.1' \
     'r-irkernel~=1.0.2' \
     'r-dplyr~=0.8.3' \
@@ -130,9 +130,9 @@ RUN conda install --quiet --yes \
 ENV CPATH=$CONDA_DIR/include
 
 RUN pip install \
-    pari_jupyter~=1.3.2 \
-    libais~=0.17 \
-    jupyter-rsession-proxy~=1.0b6 \
+#    pari_jupyter~=1.3.2 \
+#    libais~=0.17 \
+#    jupyter-rsession-proxy~=1.0b6 \
     scilab-kernel~=0.9.10 && \
     fix-permissions $CONDA_DIR
 
