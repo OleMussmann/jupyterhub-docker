@@ -16,9 +16,9 @@ services:
       - DOCKER_NETWORK_NAME=${COMPOSE_PROJECT_NAME}_default
       - HUB_IP=jupyterhub
       - HOST
-    labels:
-      - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:${HOST}"
+        #    labels:
+        #      - "traefik.enable=true"
+        #      - "traefik.frontend.rule=Host:${HOST}"
     restart: on-failure
     ports:
       - "8000:8000"
