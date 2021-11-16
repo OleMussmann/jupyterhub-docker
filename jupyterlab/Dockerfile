@@ -138,11 +138,11 @@ RUN pip install \
 
 # jupyterlab-server-proxy in the repo is not yet compatible with jupyterlab 1.0, compiling from source.
 # See https://github.com/jupyterhub/jupyter-server-proxy/issues/1394
-RUN cd /tmp/ && \
-    git clone --depth 1 https://github.com/jupyterhub/jupyter-server-proxy && \
-    cd jupyter-server-proxy/jupyterlab-server-proxy && \
-    npm install && npm run build && jupyter labextension link . && \
-    npm run build && jupyter lab build
+#RUN cd /tmp/ && \
+#    git clone --depth 1 https://github.com/jupyterhub/jupyter-server-proxy && \
+#    cd jupyter-server-proxy/jupyterlab-server-proxy && \
+#    npm install && npm run build && jupyter labextension link . && \
+#    npm run build && jupyter lab build
 
 # The desktop package uses /usr/lib/rstudio/bin
 ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
