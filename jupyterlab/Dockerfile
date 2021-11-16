@@ -122,7 +122,7 @@ RUN conda install --quiet --yes \
     'r-sparklyr~=1.0.2' \
     'r-tmap~=2.2' \
     'r-htmlwidgets~=1.3' \
-    'r-hexbin~=1.27.3' \
+    'r-hexbin~=1.27.3' && \
 #    'julia~=1.0.3' && \
     conda clean --all -y && \
     fix-permissions $CONDA_DIR
