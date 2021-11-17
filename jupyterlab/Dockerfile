@@ -25,15 +25,15 @@ RUN apt-get -y update && \
 # Mesos dependencies
 # Install from the Xenial Mesosphere repository since there does not (yet)
 # exist a Bionic repository and the dependencies seem to be compatible for now.
-COPY mesos.key /tmp/
-RUN apt-get -y update && \
-    apt-get install --no-install-recommends -y gnupg && \
-    apt-key add /tmp/mesos.key && \
-    echo "deb http://repos.mesosphere.io/ubuntu xenial main" > /etc/apt/sources.list.d/mesosphere.list && \
-    apt-get -y update && \
-    apt-get --no-install-recommends -y install mesos=1.2\* && \
-    apt-get purge --auto-remove -y gnupg && \
-    rm -rf /var/lib/apt/lists/*
+#COPY mesos.key /tmp/
+#RUN apt-get -y update && \
+  #    apt-get install --no-install-recommends -y gnupg && \
+  #  apt-key add /tmp/mesos.key && \
+  #  echo "deb http://repos.mesosphere.io/ubuntu xenial main" > /etc/apt/sources.list.d/mesosphere.list && \
+  #  apt-get -y update && \
+  #  apt-get --no-install-recommends -y install mesos=1.2\* && \
+  #  apt-get purge --auto-remove -y gnupg && \
+  #  rm -rf /var/lib/apt/lists/*
 
 # Spark and Mesos config
 #ENV SPARK_HOME /usr/local/spark
